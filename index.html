@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    
+     <link rel="stylesheet" href="https://www.ft.com/__origami/service/build/v3/bundles/css?components=o-grid@^6.0.0,o-colors@^6.0.8,o-typography@^7.0.2,o-forms@^9.4.0,o-buttons@^7.6.0,o-table@^9.0.2&brand=core&system_code=$$$-no-bizops-system-code-$$$"/>
+    
+
+    <title>ftheadlines</title>
+      
+    
+ 
+</head>
+    
+
+	<body class="o-colors-page-background">
+        <div class="o-grid-container o-typography-wrapper">
+			<div class="o-grid-row" data-o-grid-colspan="center 8">
+    <h1>Headlines From The Financial Times</h1>
+
+
+
+                
+            <span class="o-forms-input o-forms-input--text o-forms-input--small o-forms-input--suffix">
+        <input type="text" name="search" id="input" value required>
+
+        <button class="o-buttons o-buttons--secondary" id="search">Search</button>
+      </span>  
+
+                        
+
+                
+
+                
+                
+    
+    <p id="demo"></p>
+
+        
+
+
+<table class="o-table  o-table--row-stripes" data-o-component="o-table" id="myTable">
+        <thead>
+            <tr>
+                <th>Headline</th>
+    
+        </thead>
+        <tbody id="myBody"></tbody>
+    
+         <tr>
+                   
+                </tr>
+    
+    </table>
+        
+       
+            </div>
+                                         <button class="o-buttons o-buttons--secondary o-buttons-icon o-buttons-icon--arrow-left o-buttons-icon--icon-only"  id="btn_prev" style="display:none;">
+      <span class="o-buttons-icon__label" >Go back</span>
+    </button>
+    <button class="o-buttons o-buttons--secondary o-buttons-icon o-buttons-icon--arrow-right o-buttons-icon--icon-only"  id="btn_next" style="display:none;">
+      <span class="o-buttons-icon__label">Go forward</span>
+    </button>
+                
+                
+ <span id="page" ></span>
+            
+            </div>
+
+
+</body>
+    
+       <script>
+           
+    function onLoad() {
+              
+
+
+
+    }
+
+    document.getElementById("search").onclick = function() {
+        var table = document.getElementById("myTable");
+
+       while (table.rows.length > 2) {
+            table.deleteRow(1);
+         table.rows[1].innerHTML = "";
+
+        }
+        
+
+
+        var str = document.getElementById("input").value;
+        var myHeaders = new Headers();
+        myHeaders.append("X-Api-Key", "59cbaf20e3e06d3565778e7b749baf91c9e1495dbccc56d795fbe3d9");
+        myHeaders.append("Content-Type", "application/json");
+
+        var raw = JSON.stringify({
+            "queryString": "title:\"" + str + "\"",
+            "resultContext": {
+                "aspects": ["title"]
+            }
+        });
+
+        var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+            redirect: 'follow'
+        };
+
+        const proxyurl = "https://cors-anywhere.herokuapp.com/";
+        const url = "https://api.ft.com/content/search/v1"; // site that doesn’t send Access-Control-*
+
+        fetch(proxyurl + url, requestOptions) // https://cors-anywhere.herokuapp.com/https://example.com
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                var cell = data.results[0].results;
+                for (var key in cell) {
+
+                    var tableRef = document.getElementById('myTable')
+                    var newRow = tableRef.insertRow(tableRef.rows.length);
+                    var newCell = newRow.insertCell(0);
+                    var newText = document.createTextNode(cell[key].title.title)
+                    newCell.appendChild(newText);
+                  //  console.log(document.getElementById("myTable").rows.length);
+
+                 //----------------------------------------------------------------------------   
+                    
+                                        var page = 2;
+    var current_page = 1;
+var records_per_page = 17;
+var l = document.getElementById("myTable").rows.length
+
+changePage(current_page);
+
+function prevPage()
+{
+
+    if (current_page > 1) {
+        current_page--;
+        changePage(current_page);
+    }
+}
+
+function nextPage()
+{
+    if (current_page < numPages()) {
+        current_page++;
+        changePage(current_page);
+    }
+}
+                    
+  function changePage(page)
+{                  
+                    
+                    
+                    
+    var btn_next = document.getElementById("btn_next");
+    var btn_prev = document.getElementById("btn_prev");
+    var listing_table = document.getElementById("myTable");
+    var page_span = document.getElementById("page");
+ 
+    // Validate page
+    if (page < 1) page = 1;
+    if (page > numPages()) page = numPages();
+
+    [...listing_table.getElementsByTagName('tr')].forEach((tr)=>{
+        tr.style.display='none'; // reset all to not display
+    });
+    listing_table.rows[0].style.display = ""; // display the title row
+
+    for (var i = (page-1) * records_per_page + 1; i < (page * records_per_page) + 1; i++) {
+        if (listing_table.rows[i]) {
+            listing_table.rows[i].style.display = ""
+        } else {
+            continue;
+        }
+    }
+    
+      page_span.innerHTML = "  Page: " + page + "/" + numPages();
+
+    if (page == 1) {
+        btn_prev.style.visibility = "hidden";
+    } else {
+        btn_prev.style="display:inline;";
+    }
+
+    if (page == numPages()) {
+        btn_next.style.visibility = "hidden";
+    } else {
+        btn_next.style="display:inline;";
+    }
+}
+                    
+                    function numPages()
+{
+    return Math.ceil((l - 1) / records_per_page);
+}
+                    
+                    document.getElementById("btn_next").onclick = function() {
+ nextPage();
+};
+document.getElementById("btn_prev").onclick = function() {
+ prevPage();
+};
+                    
+                    console.log("l is " + l);
+
+                    
+                    
+    
+                    
+                 //----------------------------------------------------------------------------   
+                }
+
+            })
+            .catch(function(err) {
+
+            })
+
+        
+        
+        
+    }
+    
+ 
+    
+                            
+
+    
+    
+    
+    
+    
+   
+    
+    
+    
+
+
+
+</script>
+    
+
+</html>
+
